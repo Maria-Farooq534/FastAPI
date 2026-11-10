@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.responses import JSONResponse
-from typing import List, Dict, Annotated, Literal
+from typing import List, Dict, Annotated, Literal, Optional
 from pydantic import BaseModel, Field, computed_field
 import json
 
@@ -48,6 +48,20 @@ class Patient(BaseModel):
         else:
             verdict = "Obese"
         return verdict
+    
+
+# To update patient info, i need to make a new pydantic model, bcz the Patient model has all required fields, but when updating record, the client might not update all the records. so i need to make it optional.
+
+class PatientUpdate(BaseModel):
+    name: Annotated[Optional[str], Field(default=None)]
+    city: Annotated[Optional[str],Field(default=None)]
+    age: Annotated[Optional[int], Field(default=None, gt=0)]
+    gender: Annotated[Optional[Literal['male', 'female','others']], Field(default=None)]
+    height: Annotated[Optional[float], Field(default=None)]
+    weight: Annotated[Optional[float], Field(default=None)]
+    
+    
+
     
 # step 2: create pydantic object
 
@@ -140,3 +154,38 @@ def create_patient(patient: Patient):
     # save_data(data)
     
 # if everything done successfully, we will then send a json response to the client, which has status code 201 that shows resource created successfully. 
+
+
+# Update Endpoint, HTTP method used: PUT
+@app.put("/edit/{patient_id}")
+def edit_patient_record(patient_id: str, patient_updated_record: PatientUpdate):
+    data = load_data()
+    if patient_id not in data:
+        raise HTTPException(status_code=404, detail=f'{patient_id} not found!')
+    
+    if patient_id in data:
+        existing_patient_info = data[patient_id]
+        
+        updated_patient_info = patient_updated_record.model_dump(exclude_unset=True) # i need to convert this pydantic object into a dict.
+        
+        for key, value in updated_patient_info.items():
+            existing_patient_info[key] = value
+            
+        # to update data, we need to convert it back into pydantic object
+        
+    existing_patient_info['id'] = patient_id        # patient id was missing from the data, so, we need to add it.
+    
+    patient_pydantic_object = Patient(**existing_patient_info)
+    
+    # now, this pydantic object has patient id as well, that we need to exclude
+    
+    existing_patient_info = patient_pydantic_object.model_dump(exclude='id')
+        
+    data[patient_id] = existing_patient_info               # update the record with new record
+    
+    save_data(data)
+        
+    return JSONResponse(status_code=200, content={'message': f'{patient_id} updated successfully'})
+         
+        
+    
