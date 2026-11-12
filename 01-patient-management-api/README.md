@@ -44,9 +44,15 @@ Visit: http://127.0.0.1:8000/docs
 | GET | `/patient/{patient_id}` | Get patient by ID |
 | GET | `/sort` | Sort patient records |
 | POST | `/create` | Add a patient |
-| PATCH | `/update/{patient_id}` | Update patient information |
+| PUT | `/update/{patient_id}` | Update patient information |
 | DELETE | `/delete/{patient_id}` | Delete a patient |
 
 ## API Preview
+
+
+
+![Swagger UI](./swagger-ui.png)
+
+## Notes
 
 This is a learning project. Patient records are stored locally in a JSON file rather than a database. The project helped me practice building REST APIs, handling HTTP requests, and validating data with Pydantic.
