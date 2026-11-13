@@ -16,7 +16,6 @@ class Patient(BaseModel):
     def bmi(self) -> float:
         return round((self.weight/self.height**2),2)
 
-    
 # 2: create pydantic object    
 
 patient_info = {

@@ -10,7 +10,7 @@ class Address(BaseModel):
 class Patient(BaseModel):
     name: str
     age: int
-    gender: str = 'Male'
+    gender: str = 'Female'
     address: Address 
 
 address_info = {
